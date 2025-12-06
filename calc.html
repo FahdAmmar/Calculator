@@ -1,138 +1,228 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Calc</title>
-    <style>
-      * {
-        padding: 0;
-        margin: 0;
-        box-sizing: border-box;
-      }
-      body {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh; /* لتوسيط العنصر عمودياً أيضاً */
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg1: #e0eafc;
+      --bg2: #cfdef3;
+      --card: rgba(255, 255, 255, 0.85);
+      --accent: #606bff;
+      --accent-2: #2b2d42;
+      --op: #ffd166;
+      --danger: #ff6b6b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    html,
+    body {
+      height: 100%
+    }
+
+    body {
+      font-family: 'Inter', system-ui, Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--bg1), var(--bg2));
+      padding: 2rem;
+    }
+
+    .calculator {
+      width: min(420px, 95vw);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(250, 250, 250, 0.85));
+      border-radius: 18px;
+      box-shadow: 0 12px 30px rgba(46, 61, 73, 0.15);
+      padding: 18px;
+      backdrop-filter: blur(6px);
+    }
+
+    .display {
+      height: 88px;
+      background: var(--card);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-end;
+      box-shadow: inset 0 -6px 18px rgba(0, 0, 0, 0.03);
+      word-break: break-all;
+    }
+
+    .display .expr {
+      color: #666;
+      font-size: 0.95rem;
+      opacity: 0.9
+    }
+
+    .display .result {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--accent-2)
+    }
+
+    .keys {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .btn {
+      background: white;
+      border-radius: 12px;
+      padding: 14px 10px;
+      border: none;
+      font-size: 1.1rem;
+      font-weight: 600;
+      box-shadow: 0 6px 12px rgba(29, 41, 51, 0.06);
+      cursor: pointer;
+      transition: transform .08s ease, box-shadow .12s ease, background .12s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-2);
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 28px rgba(29, 41, 51, 0.08)
+    }
+
+    .btn:active {
+      transform: translateY(-1px)
+    }
+
+    .btn.op {
+      background: linear-gradient(180deg, var(--op), #ffd28a);
+    }
+
+    .btn.accent {
+      background: linear-gradient(180deg, var(--accent), #4e55ff);
+      color: white
+    }
+
+    .btn.clear {
+      background: linear-gradient(180deg, #fff3f3, #ffecec);
+      color: var(--danger)
+    }
+
+    .btn.zero {
+      grid-column: span 2
+    }
+
+    @media (max-width:420px) {
+      .display {
+        height: 78px
       }
 
-      section {
-        margin: 1rem auto;
-        width: 300px;
-        height: 600px;
-        /* border-radius: 2rem; */
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        position: relative;
-        flex-wrap: wrap;
-        align-content: space-between;
-        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
-          0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      .btn {
+        padding: 12px;
+        font-size: 1rem
       }
+    }
+  </style>
+</head>
 
-      .input {
-        position: absolute;
-        top: 0;
-        background-color: white;
-        width: 100%;
-        height: 100px;
-        color: black;
-        font-weight: bold;
-        font-size: 2rem;
-        border-bottom: 5px solid #000;
-        padding: 1rem;
-      }
-      .up {
-        height: 400px;
-        width: 100%;
-        position: absolute;
-        bottom: 10%;
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
-        align-content: space-between;
-        gap: 0.5rem;
-      }
-      aside {
-        text-align: center;
-        color: black;
-        width: 2rem;
-        height: 2rem;
-        padding: 2rem;
-        border: 2px solid #000;
-        cursor: pointer;
-        font-weight: bold;
-        font-size: 1.5rem;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-      .eq {
-        background-color: rgb(96, 107, 255);
-        color: white;
-      }
-      aside:hover {
-        background-color: hsl(60, 2%, 17%);
-        color: aliceblue;
-      }
-    </style>
-  </head>
+<body>
+  <main class="calculator" role="application" aria-label="Calculator">
+    <div class="display" aria-live="polite">
+      <div class="expr" id="expr">&nbsp;</div>
+      <div class="result" id="result">0</div>
+    </div>
 
-  <body>
-    <section class="con">
-      <div class="input"></div>
-      <div class="up">
-        <aside>C</aside>
-        <aside>/</aside>
-        <aside>*</aside>
-        <aside>&larr;</aside>
-        <aside>7</aside>
-        <aside>8</aside>
-        <aside>9</aside>
-        <aside>-</aside>
-        <aside>4</aside>
-        <aside>5</aside>
-        <aside>6</aside>
-        <aside>+</aside>
-        <aside>1</aside>
-        <aside>2</aside>
-        <aside>3</aside>
-        <aside>.</aside>
-        <aside>(</aside>
-        <aside>0</aside>
-        <aside>)</aside>
-        <aside class="eq">=</aside>
-      </div>
-    </section>
+    <div class="keys" role="group" aria-label="Calculator keys">
+      <button class="btn clear" data-key="C">C</button>
+      <button class="btn" data-key="/">/</button>
+      <button class="btn" data-key="*">*</button>
+      <button class="btn" data-key="back">←</button>
 
-    <script>
-      let input = document.querySelector(".input");
-      let buttons = Array.from(document.querySelectorAll("aside"));
+      <button class="btn" data-key="7">7</button>
+      <button class="btn" data-key="8">8</button>
+      <button class="btn" data-key="9">9</button>
+      <button class="btn op" data-key="-">-</button>
 
-      buttons.map((button) => {
-        button.addEventListener("click", (e) => {
-          switch (e.target.innerText) {
-            case "C":
-              input.innerText = "";
-              break;
-            case "←":
-              input.innerText = input.innerText.slice(0, -1);
-              break;
-            case "=":
-              try {
-                input.innerText = eval(input.innerText);
-              } catch {
-                input.innerText = "Error!";
-              }
-              break;
-            default:
-              input.innerText += e.target.innerText;
-              break;
-          }
-        });
+      <button class="btn" data-key="4">4</button>
+      <button class="btn" data-key="5">5</button>
+      <button class="btn" data-key="6">6</button>
+      <button class="btn op" data-key="+">+</button>
+
+      <button class="btn" data-key="1">1</button>
+      <button class="btn" data-key="2">2</button>
+      <button class="btn" data-key="3">3</button>
+      <button class="btn" data-key=".">.</button>
+
+      <button class="btn" data-key="(">(</button>
+      <button class="btn zero" data-key="0">0</button>
+      <button class="btn" data-key=")">)</button>
+      <button class="btn accent" data-key="=">=</button>
+    </div>
+  </main>
+
+  <script>
+    const exprEl = document.getElementById('expr');
+    const resultEl = document.getElementById('result');
+    const keys = Array.from(document.querySelectorAll('.btn'));
+
+    let expression = '';
+
+    function render() {
+      exprEl.textContent = expression || '\u00A0';
+      resultEl.textContent = expression ? expression : '0';
+    }
+
+    function calculate() {
+      try {
+        // Basic safety: allow only numbers and operators
+        // (This remains simple; for production use a proper parser.)
+        const safe = expression.replace(/[^0-9()+\-*/.% ]/g, '');
+        const value = eval(safe);
+        expression = String(value);
+      } catch (e) {
+        expression = 'Error';
+      }
+      render();
+    }
+
+    keys.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const k = btn.dataset.key;
+        handleKey(k);
       });
-    </script>
-  </body>
+    });
+
+    function handleKey(k) {
+      if (k === 'C') { expression = ''; render(); return; }
+      if (k === 'back') { expression = expression.slice(0, -1); render(); return; }
+      if (k === '=') { calculate(); return; }
+      // Append
+      expression += k;
+      render();
+    }
+
+    // Keyboard support
+    window.addEventListener('keydown', (e) => {
+      const key = e.key;
+      if ((/^[0-9().+\-*/%]$/).test(key)) {
+        expression += key; render();
+      } else if (key === 'Enter') { e.preventDefault(); calculate(); }
+      else if (key === 'Backspace') { expression = expression.slice(0, -1); render(); }
+      else if (key === 'Escape') { expression = ''; render(); }
+    });
+
+    // initial render
+    render();
+  </script>
+</body>
+
 </html>
